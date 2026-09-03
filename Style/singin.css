@@ -1,0 +1,93 @@
+body {
+    background-color: #a1d0be;
+    font-family: "Chakra Petch", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    position: fixed;
+    left: 370px;
+    top: 170px;
+}
+
+.box1{
+    background-color: #4c8172;
+    display: block;
+    width: 300px;
+    height: fit-content;
+    text-align: center;
+    border-radius: 50px;
+    padding: 10px;
+    min-height: 400px;
+}
+.box1 h1,h2,p{
+    color: white;
+}
+.box1 img {
+    width: 200px;
+    height: auto;
+    margin: 0;
+    padding: 0;
+}
+.box1 button {
+    padding: 10px;
+    border: none;
+    border-radius: 30px;
+    background-color: white;
+    color: #4c8172;
+    font-size: large;
+    font-family: "Chakra Petch", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+.inputBox{
+    display: flex;
+    background-color: white;
+    flex-direction: column;
+    border-radius: 50px;
+    width: 400px;
+    padding: 15px;
+
+}
+.inputBox h1{
+    color: #4c8172;
+    margin-left: 35%;
+}
+
+.inputBox button{
+    padding: 10px;
+    border: none;
+    border-radius: 30px;
+    background-color: #4c8172;
+    color: white;
+    font-size: large;
+    margin: 20px;
+    font-family: "Chakra Petch", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+.input {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0;
+}
+.input input{
+    border-radius: 30px;
+    border: none;
+    background-color: whitesmoke;
+    font-size: 20px;
+    margin: 20px;
+    padding: 10px;
+    max-width: 400px;
+    
+
+}
+.input label{
+    font-size: 26px;
+    margin-left: 20px;
+    color: #4c8172;
+}
