@@ -20,11 +20,6 @@ db.connect((err) => {
     console.log("Connect DB Successfully!")
 })
 
-// app.post('/api/signIn', (req, res)=> {
-//     const {firstname, lastname} = req.body;
-
-// });
-
 app.post('/api/signUp', (req, res) => {
     const {username, password, firstname, lastname, email} = req.body;
 
