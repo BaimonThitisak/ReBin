@@ -26,11 +26,11 @@
             <form id="signinform">
                 <div class="input">
                     <label>Username :</label>
-                    <input type="text">
+                    <input type="text" id="username">
                 </div>
                 <div class="input">
                     <label>Password :</label>
-                    <input type="text">
+                    <input type="text" id="password">
                 </div>
             </form>
             <button>Sign In</button>
@@ -38,7 +38,15 @@
     </div>
 
     <script>
-        
+        document.getElementById('signinform').addEventListener('submit', async(e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            
+
+        })
     </script>
 </body>
 </html>

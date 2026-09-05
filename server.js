@@ -1,16 +1,26 @@
 const express = require('express');
 const mysql = require('mysql2');
+const path = require('path');
 
 const app = express();
 const port = 3000;
 
 app.use(express.json());
 
+// ลบคำสั่ง express.static แบบเดิมออก แล้วแทนที่ด้วย 2 บรรทัดนี้
+app.use('/Style', express.static(path.join(__dirname, 'Style')));
+app.use('/img', express.static(path.join(__dirname, 'img'))); // เพิ่มเผื่อไว้สำหรับโหลดรูปภาพ
+
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname,'Frontend','signin.html'));
+});
+
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'ReBin'
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "ReBin"
 })
 
 db.connect((err) => {
@@ -20,11 +30,13 @@ db.connect((err) => {
     console.log("Connect DB Successfully!")
 })
 
-app.post('/api/signUp', (req, res) => {
+
+
+app.post('/api/signUp', async (req, res) => {
     const {username, password, firstname, lastname, email} = req.body;
 
-    const query = "INSERT INTO user(username, password, firstname, lastname, email) VALUES (?, ?, ?, ?, ?)";
-    db.query(query, [username, password, firstname, lastname, email], (err, results) => {
+    const sql = "INSERT INTO user(username, password, firstname, lastname, email) VALUES (?, ?, ?, ?, ?)";
+    db.query(sql, [username, password, firstname, lastname, email], (err, results, fields) => {
         if (err) {
             console.error("Insert Failed : ",err);
             res.status(500).json({error : err.message });
@@ -35,6 +47,22 @@ app.post('/api/signUp', (req, res) => {
         });
     })
 })
+
+app.get('/api/signIn/', async (req, res) =>{
+    const {username} =req.body;
+
+    const sql = "SELECT * FROM user WHERE username = ? "
+    db.query(sql, [username], (err, results, fields) => {
+        
+        if (results.length > 0) {
+            res.json({ message: "เข้ารู้ระบบเรียนร้อย"});
+        } else {
+            res.status(401).json({message : "ไม่สามารถเข้าสู่ระบบได้ "})
+        }
+
+    })
+})
+
 
 app.listen(port, () => {
     console.log(`Server is Running on http://localhost:${port}`);
