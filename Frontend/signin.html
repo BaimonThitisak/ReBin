@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ReBin</title>
+    <title>ReBin-SignIn</title>
 
     <link rel="stylesheet" href="../Style/singin.css">
 
@@ -19,7 +19,7 @@
             <h2>to</h2>
             <img src="../img/white-logo.png">
             <p>Don't Have an Account ?</p>
-            <button>Sign Up</button>
+            <button onclick="document.location='/signup'">Sign Up</button>
         </div>
         <div class="inputBox">
             <h1>Sign IN</h1>
@@ -43,6 +43,39 @@
 
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
+
+            try {
+                
+                const response = await fetch('/api/signIn/',{
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('เข้าสู้ระบบเรียบร้อย');
+
+                    localStorage.setItem('userId', data.user.id);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+
+                    if (data.user.role === 'admin') {
+                        window.location = '/main';
+
+                    } else {
+                        window.location = '/admindash';
+                    }
+                } else {
+                    alert('ไม่สามารถเข้ารู้ระบบได้!!');
+                }
+
+            } catch (error) {
+                console.error('Error', error);
+                alert('Error!! โปรดลองอีกครั้ง')
+            }
 
             
 

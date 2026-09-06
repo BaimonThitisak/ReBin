@@ -7,15 +7,30 @@ const port = 3000;
 
 app.use(express.json());
 
-// ลบคำสั่ง express.static แบบเดิมออก แล้วแทนที่ด้วย 2 บรรทัดนี้
+
 app.use('/Style', express.static(path.join(__dirname, 'Style')));
-app.use('/img', express.static(path.join(__dirname, 'img'))); // เพิ่มเผื่อไว้สำหรับโหลดรูปภาพ
+app.use('/img', express.static(path.join(__dirname, 'img')));
 
-
+// เชื่อมหน้า
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname,'Frontend','signin.html'));
 });
-
+app.get('/signup', (req, res) => {
+    res.sendFile(path.join(__dirname, 'Frontend', 'signup.html'));
+});
+app.get('/main', (req, res) => {
+    res.sendFile(path.join(__dirname, 'Frontend', 'main.html'));
+});
+app.get('/price', (req, res) => {
+    res.sendFile(path.join(__dirname, 'Frontend', 'price.html'));
+});
+app.get('/wallet', (req, res) => {
+    res.sendFile(path.join(__dirname, 'Frontend', 'wallet.html'));
+});
+app.get('/booking', (req, res) => {
+    res.sendFile(path.join(__dirname, 'Frontend', 'booking.html'));
+});
+//
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
