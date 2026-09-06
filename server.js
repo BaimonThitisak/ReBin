@@ -7,10 +7,6 @@ const port = 3000;
 
 app.use(express.json());
 
-
-app.use('/Style', express.static(path.join(__dirname, 'Style')));
-app.use('/img', express.static(path.join(__dirname, 'img')));
-
 // เชื่อมหน้า
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname,'Frontend','signin.html'));
@@ -30,7 +26,15 @@ app.get('/wallet', (req, res) => {
 app.get('/booking', (req, res) => {
     res.sendFile(path.join(__dirname, 'Frontend', 'booking.html'));
 });
+app.get('/admindashboard', (req, res) => {
+    res.sendFile(path.join(__dirname, 'Frontend', 'admindashboard.html'));
+});
 //
+
+app.use('/Style', express.static(path.join(__dirname, 'Style')));
+app.use('/img', express.static(path.join(__dirname, 'img')));
+
+
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
@@ -40,9 +44,9 @@ const db = mysql.createConnection({
 
 db.connect((err) => {
     if (err) {
-        console.error("failed to connect DB!", err);
+        console.error("เชื่อม DB ไม่ได้", err);
     }
-    console.log("Connect DB Successfully!")
+    console.log("เชื่อม DB แล้ว!!")
 })
 
 
@@ -58,19 +62,24 @@ app.post('/api/signUp', async (req, res) => {
         }
 
         res.json({
-            message: "registration is complete." 
+            message: "สมัครสมาชิกเรียบร้อย" 
         });
     })
 })
 
-app.get('/api/signIn/', async (req, res) =>{
-    const {username} =req.body;
+app.post('/api/signIn/', async (req, res) =>{
+    const {username, password} =req.body;
 
-    const sql = "SELECT * FROM user WHERE username = ? "
-    db.query(sql, [username], (err, results, fields) => {
+    const sql = "SELECT * FROM user WHERE username = ? AND password = ?";
+    db.query(sql, [username, password], (err, results) => {
         
         if (results.length > 0) {
-            res.json({ message: "เข้ารู้ระบบเรียนร้อย"});
+            const user = results[0];
+            res.json({ 
+                message: "เข้าสู่ระบบเรียนร้อย",
+                user: user
+            });
+
         } else {
             res.status(401).json({message : "ไม่สามารถเข้าสู่ระบบได้ "})
         }
