@@ -4,8 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ReBin-Booking</title>
+    <link rel="stylesheet" href="/Style/main.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Oswald:wght@200..700&display=swap" rel="stylesheet">
+
 </head>
 <body>
-    
+    <div class="nav-bar">
+        <div class="logo" onclick="document.location.reload()">
+            <img src="/img/white-logo.png">
+        </div>
+        <div class="space1">
+            <p>|</p>
+        </div>
+        <div class="main" onclick="document.location='/main' ">
+            <p>หน้าหลัก</p>
+        </div>
+        <div class="space">
+            <p>|</p>
+        </div>
+        <div class="price" onclick="document.location='/price' ">
+            <p>ราคาขยะ</p>
+        </div>
+        <div class="space">
+            <p>|</p>
+        </div>
+        <div class="book" onclick="document.location='/booking' ">
+            <p>จองคิว</p>
+        </div>
+        <div class="space">
+            <p>|</p>
+        </div>
+        <div class="wallet" onclick="document.location='/wallet' ">
+            <p>ประเป๋าเงิน</p>
+        </div>
+        <div class="space">
+            <p>|</p>
+        </div>
+        <div class="exit" onclick="document.location ='/' ">
+            <img src="/img/exit.png">
+        </div>
+    </div>
 </body>
 </html>

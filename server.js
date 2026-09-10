@@ -7,6 +7,9 @@ const port = 3000;
 
 app.use(express.json());
 
+app.use('/Style', express.static(path.join(__dirname, 'Style')));
+app.use('/img', express.static(path.join(__dirname, 'img')));
+
 // เชื่อมหน้า
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname,'Frontend','signin.html'));
@@ -31,10 +34,6 @@ app.get('/admindashboard', (req, res) => {
 });
 //
 
-app.use('/Style', express.static(path.join(__dirname, 'Style')));
-app.use('/img', express.static(path.join(__dirname, 'img')));
-
-
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
@@ -57,7 +56,7 @@ app.post('/api/signUp', async (req, res) => {
     const sql = "INSERT INTO user(username, password, firstname, lastname, email) VALUES (?, ?, ?, ?, ?)";
     db.query(sql, [username, password, firstname, lastname, email], (err, results, fields) => {
         if (err) {
-            console.error("Insert Failed : ",err);
+            console.error("ไม่สามารถบันทึกได้ : ",err);
             res.status(500).json({error : err.message });
         }
 

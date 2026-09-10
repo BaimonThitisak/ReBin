@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ReBin-SignUp</title>
 
-    <link rel="stylesheet" href="../Style/signup.css">
+    <link rel="stylesheet" href="/Style/signup.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +18,7 @@
         <div class="box1">
             <h1>Welcome</h1>
             <h2>to</h2>
-            <img src="../img/white-logo.png">
+            <img src="/img/white-logo.png">
             <p>rebin แพลตฟอร์มซื้อขายขยะรีไซเคิลออนไลน์ ที่ช่วยให้การจัดการขยะที่บ้านเป็นเรื่องง่าย ผู้ใช้สามารถเช็คราคาขยะได้แบบเรียลไทม์ และกดจองนัดหมายให้เจ้าหน้าที่เข้ารับขยะถึงหน้าบ้านได้ทันที สะดวก รวดเร็ว ได้เงินชัวร์ โดยไม่ต้องเดินทางไปร้านรับซื้อด้วยตัวเอง</p>
             
             <button onclick="document.location='/'">Sign In</button>
@@ -57,12 +57,42 @@
                     </div>
                 </div>
             </form>
-            <button>Sign Up</button>
+            <button onclick="signup()">Sign Up</button>
         </div>
     </div>
 
     <script>
+        async function signup() {
+            const username = document.getElementById('username').value;
+            const firstname = document.getElementById('firstname').value;
+            const lastname = document.getElementById('lastname').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById("password").value;        
+            // const confirmpassword = document.getElementById(confirmpassword).value;
 
+            try {
+                
+                const response = await fetch('/api/signUp/',{
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({username, password, firstname, lastname, email})
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('สมัครสมาชิกเรียบร้อย');
+                    document.location = '/';
+                } else{
+                    alert('ไม่สามารถสมัครสมาชิกได้');
+                }
+
+            } catch (error) {
+                console.error('Error', error);
+                alert('Error!! โปรดลองอีกครั้ง');
+            }
+            
+        }
     </script>
 </body>
 </html>

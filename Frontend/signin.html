@@ -26,11 +26,11 @@
             <form id="signinform">
                 <div class="input">
                     <label>Username :</label>
-                    <input type="text" id="username">
+                    <input type="text" id="username" required>
                 </div>
                 <div class="input">
                     <label>Password :</label>
-                    <input type="text" id="password">
+                    <input type="text" id="password" required>
                 </div>
                 <!-- <div class="checkpass">
                     <input type="checkbox" id="passcheck">
@@ -45,10 +45,6 @@
     <script>
         
         async function signin() {
-            
-    
-        
-
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
@@ -56,22 +52,20 @@
                 
                 const response = await fetch('/api/signIn/',{
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ username, password })
                 });
 
-                const data = await response.json();
+                const result = await response.json();
 
                 if (response.ok) {
                     alert('เข้าสู้ระบบเรียบร้อย');
 
-                    localStorage.setItem('userId', data.user.id);
-                    localStorage.setItem('user', JSON.stringify(data.user));
+                    localStorage.setItem('userId', result.user.id);
+                    localStorage.setItem('user', JSON.stringify(result.user));
 
-                    if (data.user.role === 'admin') {
-                        window.location = '/admindashboard';
+                    if (result.user.role === 'admin') {
+                        document.location = '/admindashboard';
                     } else {
                         document.location = '/main';
                     }
@@ -81,7 +75,7 @@
 
             } catch (error) {
                 console.error('Error', error);
-                alert('Error!! โปรดลองอีกครั้ง')
+                alert('Error!! โปรดลองอีกครั้ง');
             }
         }
     
