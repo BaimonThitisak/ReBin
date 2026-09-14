@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
@@ -15,7 +16,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/BaimonThitisak/ReBin/issues"
   },
@@ -24,7 +24,11 @@
     "nodemon": "^3.1.14"
   },
   "dependencies": {
+    "axios": "^1.20.0",
+    "cheerio": "^1.2.0",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "mysql2": "^3.24.2"
+    "mysql2": "^3.24.2",
+    "node-fetch": "^3.3.2"
   }
 }

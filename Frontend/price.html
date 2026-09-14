@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ReBin-Price</title>
 
-    <link rel="stylesheet" href="/Style/main.css">
+    <link rel="stylesheet" href="/Style/price.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,9 +44,30 @@
         <div class="space">
             <p>|</p>
         </div>
-        <div class="exit" onclick="document.location ='/' ">
+        <div class="exit" onclick="openExit()">
             <img src="/img/exit.png">
         </div>
     </div>
+    <div id="exit-Popup">
+        <div class="exit-Content">
+            <h1>ต้องการออกจากระบบหรือไม่</h1>
+            <div class="exit-button">
+                <button class="yes" onclick="document.location='/'">ใช่</button>
+                <button class="no" onclick="closeExit()">ไม่</button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+        function openExit() {
+            document.getElementById('exit-Popup').style.display = 'flex' ;
+        }
+        function closeExit() {
+            document.getElementById('exit-Popup').style.display = 'none' ; 
+        }
+        
+    </script>
 </body>
 </html>

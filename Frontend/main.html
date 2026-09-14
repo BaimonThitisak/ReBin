@@ -44,7 +44,7 @@
         <div class="space">
             <p>|</p>
         </div>
-        <div class="exit" onclick="document.location ='/' ">
+        <div class="exit" onclick="openExit()">
             <img src="/img/exit.png">
         </div>
     </div>
@@ -52,15 +52,21 @@
         <div class="exit-Content">
             <h1>ต้องการออกจากระบบหรือไม่</h1>
             <div class="exit-button">
-                <button class="yes">ใช่</button>
-                <button class="no">ไม่</button>
+                <button class="yes" onclick="document.location='/'">ใช่</button>
+                <button class="no" onclick="closeExit()">ไม่</button>
             </div>
         </div>
     </div>
 
 
-    <script>
 
+    <script>
+        function openExit() {
+            document.getElementById('exit-Popup').style.display = 'flex' ;
+        }
+        function closeExit() {
+            document.getElementById('exit-Popup').style.display = 'none' ; 
+        }
         
     </script>
 </body>

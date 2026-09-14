@@ -1,9 +1,13 @@
-const express = require('express');
-const mysql = require('mysql2');
-const path = require('path');
+import express from 'express';
+import mysql from 'mysql2';
+import path from 'path';
+
+// const mysql = require('mysql2');
+// const path = require('path');
 
 const app = express();
 const port = 3000;
+const __dirname = import.meta.dirname;
 
 app.use(express.json());
 
