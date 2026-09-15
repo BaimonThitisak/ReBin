@@ -9,7 +9,7 @@ body {
 .container {
     display: flex;
     flex-direction: row;
-    position: fixed;
+    position: absolute;
     left: 370px;
     top: 170px;
 }
