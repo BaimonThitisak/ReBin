@@ -1,3 +1,4 @@
+import { error } from 'console';
 import express from 'express';
 import mysql from 'mysql2';
 import path from 'path';
@@ -58,7 +59,7 @@ app.post('/api/signUp', async (req, res) => {
     const {username, password, firstname, lastname, email} = req.body;
 
     const sql = "INSERT INTO user(username, password, firstname, lastname, email) VALUES (?, ?, ?, ?, ?)";
-    db.query(sql, [username, password, firstname, lastname, email], (err, results, fields) => {
+    db.query(sql, [username, password, firstname, lastname, email], (err, results) => {
         if (err) {
             console.error("ไม่สามารถบันทึกได้ : ",err);
             res.status(500).json({error : err.message });
@@ -90,6 +91,22 @@ app.post('/api/signIn/', async (req, res) =>{
     })
 })
 
+
+app.post('/api/booking/', async (req, res) => {
+    const {user_id, name, date, time, latitude, longitude, phone} = req.body;
+
+    const sql = "INSERT INTO booking(user_id, name, date, time, latitude, longitude, phone) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    db.query(sql, [user_id, name, date, time, latitude, longitude, phone], (err,results) => {
+        if (err) {
+            console.error('ไม่สามารถบันทึกการจองได้ : ', err);
+            res.status(500).json({error : err.message});
+
+        } else {
+            res.json({message: 'บันทึกการจองเรียบร้อยแล้ว'});
+        }
+    } )
+
+})
 
 app.listen(port, () => {
     console.log(`Server is Running on http://localhost:${port}`);

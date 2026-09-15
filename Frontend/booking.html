@@ -62,7 +62,7 @@
             
             <div id="map"></div>
 
-    
+        <div class="bookdetail">
                 <h2>ข้อมูลการนัดหมาย</h2>
                 <form id="bookingDT">
                     <p>ชื่อผู้นัดหมาย</p>
@@ -70,12 +70,13 @@
                     <p>เบอร์โทร</p>
                     <input type="text" id="tel">
                     <p>วันที่นัดหมาย</p>
-                    <input type="date" id="appointment-date">
+                    <input type="date" id="date">
                     <p>เวลาที่นัดหมาย</p>
-                    <input type="time" id="appointment-time">
+                    <input type="time" id="time">
                 </form>
-            <button class="bookBT">จองคิว</button>
-            
+            </div>
+            <button class="bookBT" onclick="book()" >จองคิว</button>
+             
 
         </div>
 
@@ -83,7 +84,7 @@
         <div class="exit-Content">
             <h1>ต้องการออกจากระบบหรือไม่</h1>
             <div class="exit-button">
-                <button class="yes" onclick="document.location='/'">ใช่</button>
+                <button class="yes" onclick="exit()">ใช่</button>
                 <button class="no" onclick="closeExit()">ไม่</button>
             </div>
         </div>
@@ -98,6 +99,10 @@
         }
         function closeExit() {
             document.getElementById('exit-Popup').style.display = 'none' ; 
+        }
+        function exit() {
+            document.location='/';
+            localStorage.clear();
         }
         
         
@@ -153,11 +158,56 @@
             if (marker) {
                 marker.setLatLng([setlat, setlng]);
             } else {
-                marker = L.marker([setlat, setlng]).addTo(map);
+                marker = L.marker([setlat, setlng], {icon: greenIcon}).addTo(map);
+            }
+        }).addTo(map);
+
+        async function book() {
+            const name = document.getElementById('bookname').value;
+            const phone = document.getElementById('tel').value;
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+            const user = localStorage.getItem('user_id');
+
+            if (!setlat || !setlng) {
+                alert('กรุณาเลือกสถานที่นัด');
+                return;
+            }
+            if (!name || !phone || !date || !time) {
+                alert('กรุณากรอกข้อมูลการจองให้ครบถ้วน');
+                return;
             }
 
-        })
-        .addTo(map);
+            try {
+                const response = await fetch('/api/booking/',{
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        user_id: user,
+                        name: name,
+                        date:date,
+                        time: time,
+                        latitude: setlat,
+                        longitude: setlng,
+                        phone: phone
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('จองคิวเรียบร้อยแล้ว');
+                    
+                } else {
+                    alert('ไม่สามรถจองคิวได้ โปรดลองใหม่อีกครั้ง');
+                }
+
+            } catch (error) {
+                console.error('Error', error);
+                alert('Error!! โปรดลองใหม่อีกครั้ง');
+
+            }
+        }
 
         
 

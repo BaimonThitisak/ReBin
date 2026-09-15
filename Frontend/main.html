@@ -52,7 +52,7 @@
         <div class="exit-Content">
             <h1>ต้องการออกจากระบบหรือไม่</h1>
             <div class="exit-button">
-                <button class="yes" onclick="document.location='/'">ใช่</button>
+                <button class="yes" onclick="exit()">ใช่</button>
                 <button class="no" onclick="closeExit()">ไม่</button>
             </div>
         </div>
@@ -66,6 +66,10 @@
         }
         function closeExit() {
             document.getElementById('exit-Popup').style.display = 'none' ; 
+        }
+        function exit() {
+            document.location='/';
+            localStorage.clear();
         }
         
     </script>
