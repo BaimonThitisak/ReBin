@@ -107,6 +107,16 @@ app.post('/api/booking/', async (req, res) => {
     } )
 
 })
+app.get('/api/price/', async (req, res) => {
+    const sql = "SELECT * FROM waste_types";
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('ไม่สามารถดึงข้อมูลได้');
+        } else {
+            res.json(results);
+        }
+    })
+})
 
 app.listen(port, () => {
     console.log(`Server is Running on http://localhost:${port}`);

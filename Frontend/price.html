@@ -48,6 +48,87 @@
             <img src="/img/exit.png">
         </div>
     </div>
+    <div class="content">
+        <div class="title">
+            <h1>ราคาขยะรีไซเคิลประจำวัน</h1>
+        </div>
+        <div class="priceDT">
+
+            <div class="plastic">
+                <h1>พลาสติก-กระดาษ</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>รายการ</th>
+                            <th>ราคา/กก.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="price-plastic">
+                        <tr>
+                            <td>
+
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="metal">
+                <h1>โหละ</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>รายการ</th>
+                            <th>ราคา/กก.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="price-metal">
+                        <tr>
+                            <td>
+                                
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="iron">
+                <h1>เหล็ก</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>รายการ</th>
+                            <th>ราคา/กก.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="price-iron">
+                        <tr>
+                            <td>
+                                
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="glass">
+                <h1>แก้ว</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>รายการ</th>
+                            <th>ราคา/กก.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="price-glass">
+                        <tr>
+                            <td>
+                                
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <div id="exit-Popup">
         <div class="exit-Content">
             <h1>ต้องการออกจากระบบหรือไม่</h1>
@@ -71,6 +152,51 @@
             document.location='/';
             localStorage.clear();
         }
+
+        async function loadPrice() {
+            try {
+                
+                const response = await fetch('/api/price/');
+                const result = await response.json();
+                
+                console.log(result);
+
+                const plastic_table = document.getElementById('price-plastic');
+                const metal_table = document.getElementById('price-metal');
+                const iron_table = document.getElementById('price-iron');
+                const glass_table = document.getElementById('price-glass');
+
+
+
+
+                result.forEach(element => {
+                    const row = `
+                        <tr>
+                            <td>${element.waste_name}</td>
+                            <td>${element.price_per_kg}</td>
+                        </tr/>
+                    `;
+                    
+                    if (element.waste_types === 'พลาสติก-กระดาษ') {
+                        plastic_table.innerHTML += row;
+                    }
+                    else if (element.waste_types === 'โลหะ') {
+                        metal_table.innerHTML += row;
+                    }
+                    else if (element.waste_types === 'เหล็ก') {
+                        iron_table.innerHTML += row;
+                    }
+                    else if (element.waste_types === 'แก้ว') {
+                        glass_table.innerHTML += row;
+                    }
+                });
+
+            } catch (error) {
+                console.error('error : ', error);
+            }
+        }
+
+        loadPrice();
         
     </script>
 </body>
