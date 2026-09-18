@@ -113,7 +113,7 @@
             
             try {
                 
-                const response = await fetch(`/api/wallet/${user_id}`);
+                const response = await fetch(`/api/user/${user_id}`);
                 const result = await response.json();
 
                 const p_amount = document.getElementById('amount');

@@ -118,7 +118,7 @@ app.get('/api/price/', async (req, res) => {
     })
 })
 
-app.get('/api/wallet/:id', async (req, res) => {
+app.get('/api/user/:id', async (req, res) => {
     
     const user_id = req.params.id;
     const sql = "SELECT * FROM user WHERE userid = ?";
@@ -129,6 +129,24 @@ app.get('/api/wallet/:id', async (req, res) => {
         } else{
             if (result.length>0) {
                 res.json(result[0]);
+            } else {
+                res.status(400).json({message : 'ไม่พบผู้ใช้'});
+            }
+        }
+    })
+})
+
+app.get('/api/bookdetail/:id', async (req, res) => {
+    
+    const user_id = req.params.id;
+    const sql = "SELECT * FROM booking WHERE user_id = ?";
+    db.query(sql, [user_id] , (err,result) =>{
+        if (err) {
+            console.error('ไม่สารมารถดึงข้อมูลกระเป๋าตังได้ : ', err);
+            res.status(500).json({error : err.message});
+        } else{
+            if (result.length>0) {
+                res.json(result);
             } else {
                 res.status(400).json({message : 'ไม่พบผู้ใช้'});
             }

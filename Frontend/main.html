@@ -48,6 +48,26 @@
             <img src="/img/exit.png">
         </div>
     </div>
+
+    <div class="content">
+        <div class="welcome">
+            <h1>ยินดีต้อนรับสู่</h1>
+            <img src="/img/rebin-logo.png">
+            <h2 id="fullname">ไม่พบข้อมูล</h2>
+        </div>
+        <div class="bookdetail">
+            <h1>ข้อมูลการจอง</h1>
+            <div id="detail">
+                <div class="DTbox">
+                    <div class="DT">
+                        <p>ไม่พบข้อมูลการจองคิว</p>
+                    </div>
+                </div> 
+            </div>
+        </div>
+        
+    </div>
+
     <div id="exit-Popup">
         <div class="exit-Content">
             <h1>ต้องการออกจากระบบหรือไม่</h1>
@@ -71,6 +91,69 @@
             document.location='/';
             localStorage.clear();
         }
+
+        async function loadfullname() {
+            
+            const user_id = localStorage.getItem('user_id');
+            
+            try {
+                
+                const response = await fetch(`/api/user/${user_id}`);
+                const result = await response.json();
+
+                const fullname = document.getElementById('fullname');
+
+                fullname.textContent = result.firstname + " " + result.lastname;
+
+
+            } catch (error) {
+                console.error('error : ',error);
+            }
+        }
+
+        async function loadBookDetail() {
+            
+            const user_id = localStorage.getItem('user_id');
+
+            try {
+                
+                const response = await fetch(`/api/bookdetail/${user_id}`);
+                const result = await response.json();
+
+                
+                const detail = document.getElementById('detail');
+
+
+                detail.innerHTML = " ";
+
+                result.forEach(element => {
+                    const formattedDate = element.date.slice(0,10);
+                    const formattedTime = element.time.slice(0,5);
+
+                    const row = `
+                        <div class="DTbox"> 
+                            <div class="DT">
+                                <p>วันที่จอง : ${formattedDate} </p>
+                                <p>เวลา : ${formattedTime} </p>
+                                <p>สถานะ : ${element.status}</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    
+                    detail.innerHTML += row;
+                    
+                    
+                });
+
+            } catch (error) {
+                console.error('error : ', error);
+            }
+        }
+
+        
+        loadfullname();
+        loadBookDetail();
         
     </script>
 </body>

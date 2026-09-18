@@ -92,3 +92,71 @@ button{
     cursor: pointer;
     font-size: 14px;
 }
+
+.content{
+    display: flex;
+    flex-direction: row;
+    position: absolute;
+    top: 15%;
+    left: 15%;
+    width: 70%;
+    gap: 0;
+}
+
+.welcome{
+    display: flex;
+    background-color: whitesmoke;
+    border-radius: 30px;
+    margin: 20px;
+    margin-right: 0;
+    flex-direction: column;
+    text-align: center;
+    padding: 10px 30px;
+    color: #4c8172;
+}
+
+.welcome img{
+    width: 300px;
+    height: 300px;
+    margin: none;
+}
+.bookdetail {
+    display: flex;
+    background-color: #4c8172;
+    color: white;
+    border-radius: 30px;
+    margin: 20px 0;
+    width: 100%;
+    height: 500px;
+    padding: 20px 30px;
+    flex-direction: column;
+}
+#detail{
+    display: flex;
+    width: 95%;
+    height: 100%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    
+}
+
+.DTbox{
+    display: flex;
+    background-color: rgba(255, 255, 255, 0.8);
+    width: 47%;
+    height: 60px;
+    border-radius: 30px;
+    padding: 0 30px;
+    align-items: center;
+    gap: 10px;
+    position: absolute;
+}
+
+.DT{
+    color: black; 
+    font-size: 19px; 
+    display: flex; 
+    flex-direction: 
+    row; gap: 30px;
+}
