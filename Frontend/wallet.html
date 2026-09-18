@@ -64,12 +64,12 @@
             <h1>กระเป๋าเงินของคุณ</h1>
             <img src="/img/wallet-2.png">
             <p>จำนวนเงินของคุณ</p>
-            <p>0.00</p>
+            <p id="amount">0.00</p>
         </div>
         <div class="withdraw">
             <h1>ถอนเงิน</h1>
 
-            <div class="bank"></div>
+            <div class="bank">
                 <label>ธนาคารปลายทาง:</label>
                 <select id="bank">
                         <option value="SCB">ธนาคารไทยพาณิชย์ (SCB)</option>
@@ -88,6 +88,7 @@
                 <input type="text">
             </div>
             <button class="bt-withdraw">ถอนเงิน</button>
+        
         </div>
 
     </div>
@@ -105,6 +106,28 @@
             document.location='/';
             localStorage.clear();
         }
+
+        async function loadWallet() {
+            
+            const user_id = localStorage.getItem('user_id');
+            
+            try {
+                
+                const response = await fetch(`/api/wallet/${user_id}`);
+                const result = await response.json();
+
+                const p_amount = document.getElementById('amount');
+
+                p_amount.textContent = result.wallet_balance ?? '0.00';
+
+
+            } catch (error) {
+                console.error('error : ',error);
+            }
+        }
+
+        loadWallet();
+
     </script>
     
 </body>

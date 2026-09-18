@@ -111,9 +111,27 @@ app.get('/api/price/', async (req, res) => {
     const sql = "SELECT * FROM waste_types";
     db.query(sql, (err, results) => {
         if (err) {
-            console.error('ไม่สามารถดึงข้อมูลได้');
+            console.error('ไม่สามารถดึงข้อมูลราคาขยะได้');
         } else {
             res.json(results);
+        }
+    })
+})
+
+app.get('/api/wallet/:id', async (req, res) => {
+    
+    const user_id = req.params.id;
+    const sql = "SELECT * FROM user WHERE userid = ?";
+    db.query(sql, [user_id] , (err,result) =>{
+        if (err) {
+            console.error('ไม่สารมารถดึงข้อมูลกระเป๋าตังได้ : ', err);
+            res.status(500).json({error : err.message});
+        } else{
+            if (result.length>0) {
+                res.json(result[0]);
+            } else {
+                res.status(400).json({message : 'ไม่พบผู้ใช้'});
+            }
         }
     })
 })
