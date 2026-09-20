@@ -75,7 +75,7 @@
                     <input type="time" id="time">
                 </form>
             </div>
-            <button class="bookBT" onclick="book()" >จองคิว</button>
+            <button class="bookBT" onclick="openPopup()" >จองคิว</button>
              
 
         </div>
@@ -90,6 +90,16 @@
         </div>
     </div>
 
+    <div id="cf-Popup">
+        <div class="cf-Content">
+            <h1>ต้องการยืนยันการจอง ?</h1>
+            <div class="cf-button">
+                <button class="yes" onclick="book()">ยืนยัน</button>
+                <button class="no" onclick="closePopup()">ยกเลิก</button>
+            </div>
+        </div>
+    </div>
+
     
 
 
@@ -99,6 +109,13 @@
         }
         function closeExit() {
             document.getElementById('exit-Popup').style.display = 'none' ; 
+        }
+
+        function openPopup() {
+            document.getElementById('cf-Popup').style.display = 'flex' ;
+        }
+        function closePopup() {
+            document.getElementById('cf-Popup').style.display = 'none' ; 
         }
         function exit() {
             document.location='/';
@@ -171,10 +188,12 @@
 
             if (!setlat || !setlng) {
                 alert('กรุณาเลือกสถานที่นัด');
+                closePopup();
                 return;
             }
             if (!name || !phone || !date || !time) {
                 alert('กรุณากรอกข้อมูลการจองให้ครบถ้วน');
+                closePopup();
                 return;
             }
 
@@ -197,16 +216,17 @@
 
                 if (response.ok) {
                     alert('จองคิวเรียบร้อยแล้ว');
-                    
                 } else {
                     alert('ไม่สามรถจองคิวได้ โปรดลองใหม่อีกครั้ง');
                 }
+                closePopup();
 
             } catch (error) {
                 console.error('Error', error);
                 alert('Error!! โปรดลองใหม่อีกครั้ง');
 
             }
+            
         }
 
         
