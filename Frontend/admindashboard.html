@@ -11,16 +11,259 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Oswald:wght@200..700&display=swap" rel="stylesheet">
 
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="crossorigin=""></script>
+
+
     
 </head>
 <body>
+    <div class="nav-bar">
+        <div class="logo" onclick="document.location.reload()">
+            <img src="/img/white-logo.png">
+        </div>
+        <!-- <div class="space1">
+            <p>|</p>
+        </div>
+        <div class="main" onclick="document.location='/main' ">
+            <p>หน้าหลัก</p>
+        </div>
+        <div class="space">
+            <p>|</p>
+        </div>
+        <div class="price" onclick="document.location='/price' ">
+            <p>ราคาขยะ</p>
+        </div>
+        <div class="space">
+            <p>|</p>
+        </div>
+        <div class="book" onclick="document.location='/booking' ">
+            <p>จองคิว</p>
+        </div>
+        <div class="space">
+            <p>|</p>
+        </div>
+        <div class="wallet" onclick="document.location='/wallet' ">
+            <p>ประเป๋าเงิน</p>
+        </div>
+        <div class="space">
+            <p>|</p>
+        </div> -->
+        <div class="exit" onclick="openExit()">
+            <img src="/img/exit.png">
+        </div>
+    </div>
     <div class="container">
         <div class="box">
-            <h1>User-Book-List</h1>
-            <div class="bookdetail">
-                
+            <h1>Booking-List</h1>
+            <div id="bookdetail">
+                <div class="DTbox">
+                    <div class="DT">
+                        <p>ไม่พบข้อมูลการจองคิว</p>
+                        <button class="BT" onclick="OpenDetailPopup()">Details</button>
+                        <button class="BT" onclick="OpenProcessPopup()">Process</button>
+                    </div>
+                </div> 
             </div>
         </div>
     </div>
+    
+    <div id="exit-Popup">
+        <div class="exit-Content">
+            <h1>ต้องการออกจากระบบหรือไม่</h1>
+            <div class="exit-button">
+                <button class="yes" onclick="exit()">ใช่</button>
+                <button class="no" onclick="closeExit()">ไม่</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="Detail-Popup">
+        <div class="Detail-Content">
+            <h1>Detail-Booking</h1>
+            <div class="bookdetail">
+                <div id="map"></div>
+                <div id="bookId">ID :</div>
+                <div id="bookname">ชื่อผู้นัดหมาย :</div>
+                <div id="bookdate">วันที่นัดหมาย :</div>
+                <div id="booktime">เวลาที่นัดหมาย :</div>
+                <div id="phone">เบอร์โทร :</div>
+                <div id="status">สถานะ :</div>
+            </div>
+            <div class="DT-button">
+                <button class="yes" onclick="">กำลังไป!!!</button>
+                <button class="no" onclick="CloseDetailPopup()">ปิด</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="Process-Popup">
+        <div class="Process-Content">
+            <h1>Process-Booking</h1>
+            <div class="process">
+                <div class="process-row">
+                    <label>รายการขยะ: </label>
+                    <select  class="waste-types">
+                            <option value="เลือก">เลือก</option>
+                                <optgroup label="พลาสติก-กระดาษ">
+                                    <option value="พลาสติกรวม">พลาสติกรวม</option>
+                                    <option value="กระดาษลัง">กระดาษลัง</option>
+                                    <option value="ท่อ PVC ฟ้า">ท่อ PVC ฟ้า</option>
+                                </optgroup>
+                                <optgroup label="เหล็ก">
+                                    <option value="ลวด">ลวด</option>
+                                    <option value="เหล็กรวม - ม้วนกลม">เหล็กรวม - ม้วนกลม</option>
+                                    <option value="เหล็กหนาสั้น">เหล็กหนาสั้น</option>
+                                    <option value="เหล็กหนายาว">เหล็กหนายาว</option>
+                                    <option value="เหล็กบาง - ตะปู">เหล็กบาง - ตะปู</option>
+                                </optgroup>
+                                <optgroup label="โหละ">
+                                    <option value="อลูมิเนียมเพลท">อลูมิเนียมเพลท</option>
+                                    <option value="อลูมิเนียมกระป๋อง 1 kg. ขึ้นไป">อลูมิเนียมกระป๋อง 1 kg. ขึ้นไป</option>
+                                    <option value="สแตนเลสแท้ 304 (ชิ้นเล็ก)">สแตนเลสแท้ 304 (ชิ้นเล็ก)</option>
+                                    <option value="สแตนเลส (ชิ้นใหญ่)">สแตนเลส (ชิ้นใหญ่)</option>
+                                    <option value="ตะกั่ว - จั๊บ แกะไม่ติด">ตะกั่ว - จั๊บ แกะไม่ติด</option>
+                                </optgroup>
+                                <optgroup label="แก้ว">
+                                    <option value="แก้วขาว">แก้วขาว</option>
+                                    <option value="แก้วแดง">แก้วแดง</option>
+                                    <option value="แก้วรวม">แก้วรวม</option>
+                                </optgroup>
+                    </select>
+                    <label>น้ำหนัก: </label>
+                    <input type="text">
+                    <label>/กก</label>      
+                </div>
+            </div>
+            <div class="DT-button">
+                <button class="yes" onclick="">ยืนยัน</button>
+                <button class="no" onclick="CloseProcessPopup()">ปิด</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let bookingID = null;
+        let DetailBooking = [];
+        let setlat = null;
+        let setlng = null; 
+        let marker = null ;
+        const greenIcon = L.icon({
+            iconUrl: '/img/pin.png',
+            iconSize:     [50, 50], 
+            iconAnchor:   [25, 50], 
+            popupAnchor:  [-50,-50]
+        });
+
+        function openExit() {
+            document.getElementById('exit-Popup').style.display = 'flex' ;
+        }
+        function closeExit() {
+            document.getElementById('exit-Popup').style.display = 'none' ; 
+        }
+        function exit() {
+            document.location='/';
+            localStorage.clear();
+        }
+
+        function OpenDetailPopup(id) {
+            bookingID = id;
+
+            const bookdetail = DetailBooking.find(el => el.booking_id === id);
+            const figdate = bookdetail.date.slice(0,10);
+            const figtime = bookdetail.time.slice(0,5);
+            setlat = bookdetail.latitude;
+            setlng = bookdetail.longitude;
+
+            if (bookdetail) {
+                document.getElementById('bookId').textContent = 'ID : '+ bookdetail.booking_id;
+                document.getElementById('bookname').textContent = 'ชื่อผู้นัดหมาย : '+ bookdetail.name;
+                document.getElementById('bookdate').textContent = 'วันที่นัดหมาย : '+ figdate;
+                document.getElementById('booktime').textContent = 'เวลาที่นัดหมาย : '+ figtime;
+                document.getElementById('phone').textContent = 'เบอร์โทร : '+ bookdetail.phone;
+                document.getElementById('status').textContent = 'สถานะ : '+ bookdetail.status;
+                
+                if (setlat && setlng) {
+                    
+                    if (marker) {
+                        marker.setLatLng([setlat, setlng], {icon: greenIcon});
+                        marker.bindPopup(`พิกัด: ${setlat}, ${setlng}`).openPopup();
+                    } else {
+                        marker = L.marker([setlat, setlng], {icon: greenIcon}).addTo(map);
+                        marker.bindPopup(`พิกัด: ${setlat}, ${setlng}`).openPopup();
+                    }
+
+                    map.setView([setlat, setlng],16);
+                }
+
+            }
+
+            
+
+            document.getElementById('Detail-Popup').style.display = 'flex' ;
+            map.invalidateSize();
+        }
+        function CloseDetailPopup() {
+            document.getElementById('Detail-Popup').style.display = 'none' ;
+        }
+        function OpenProcessPopup(id) {
+            bookingID = id;
+            document.getElementById('Process-Popup').style.display = 'flex' ;
+        }
+        function CloseProcessPopup() {
+            document.getElementById('Process-Popup').style.display = 'none' ;
+        }
+
+        async function loadBookDetail() {
+            
+            try {
+                
+                const response = await fetch(`/api/bookdetail/`);
+                const result = await response.json();
+
+                DetailBooking = result;
+                
+                const detail = document.getElementById('bookdetail');
+
+
+                detail.innerHTML = " ";
+
+                result.forEach(element => {
+                    const figDate = element.date.slice(0,10);
+                    const figTime = element.time.slice(0,5);
+
+                    const row = `
+                        <div class="DTbox"> 
+                            <div class="DT">
+                                <p >ID : ${element.booking_id}</p>
+                                <p>วันที่จอง : ${figDate}</p>
+                                <p>เวลา : ${figTime}</p>
+                                <p>สถานะ : ${element.status}</p>
+                                <button class="BT" onclick="OpenDetailPopup(${element.booking_id})">Details</button>
+                                <button class="BT" onclick="OpenProcessPopup(${element.booking_id})">Process</button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    
+                    detail.innerHTML += row;
+
+                    
+                });
+
+            } catch (error) {
+                console.error('error : ', error);
+            }
+        }
+        loadBookDetail();
+        
+        const map = new L.Map('map').setView([13.7563, 100.5018], 13);
+        new L.TileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+
+    </script>
 </body>
 </html>

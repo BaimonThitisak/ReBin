@@ -95,7 +95,7 @@ app.post('/api/signIn/', async (req, res) =>{
 app.post('/api/booking/', async (req, res) => {
     const {user_id, name, date, time, latitude, longitude, phone} = req.body;
 
-    const sql = "INSERT INTO booking(user_id, name, date, time, latitude, longitude, phone) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    const sql = "INSERT INTO booking(user_id, name, date, time, latitude, longitude, phone, booking_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
     db.query(sql, [user_id, name, date, time, latitude, longitude, phone], (err,results) => {
         if (err) {
             console.error('ไม่สามารถบันทึกการจองได้ : ', err);
@@ -153,6 +153,23 @@ app.get('/api/bookdetail/:id', async (req, res) => {
         }
     })
 })
+app.get('/api/bookdetail/', async (req, res) => {
+    
+    const sql = "SELECT * FROM booking";
+    db.query(sql, (err,result) =>{
+        if (err) {
+            console.error('ไม่สารมารถดึงข้อมูลกระเป๋าตังได้ : ', err);
+            res.status(500).json({error : err.message});
+        } else{
+            if (result.length>0) {
+                res.json(result);
+            } else {
+                res.status(400).json({message : 'ไม่พบผู้ใช้'});
+            }
+        }
+    })
+})
+
 
 app.listen(port, () => {
     console.log(`Server is Running on http://localhost:${port}`);

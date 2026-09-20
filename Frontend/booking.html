@@ -208,7 +208,7 @@
                         time: time,
                         latitude: setlat,
                         longitude: setlng,
-                        phone: phone
+                        phone: phone,
                     })
                 });
 
@@ -220,11 +220,11 @@
                     alert('ไม่สามรถจองคิวได้ โปรดลองใหม่อีกครั้ง');
                 }
                 closePopup();
+                document.location.reload();
 
             } catch (error) {
                 console.error('Error', error);
                 alert('Error!! โปรดลองใหม่อีกครั้ง');
-
             }
             
         }
