@@ -16,6 +16,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
 </head>
 <body>
     
@@ -178,7 +180,7 @@
                 marker = L.marker([setlat, setlng], {icon: greenIcon}).addTo(map);
             }
         }).addTo(map);
-
+        
         async function book() {
             const name = document.getElementById('bookname').value;
             const phone = document.getElementById('tel').value;
@@ -229,9 +231,34 @@
             
         }
 
-        
+        let lineUserId = null;
+        async function initLIFF() {
+            try {
+                await liff.init({ liffId: '2011044286-bZoOlruD' });
+                if (liff.isLoggedIn()) {
+                    const profile = await liff.getProfile();
+                    lineUserId = profile.userId;
 
-        
+                    const user_id = localStorage.getItem('user_id');
+
+                    if (user_id && lineUserId) {
+                        const response = ('/api/update-line-id/', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                                userid: user_id,
+                                lineID: lineUserId,
+                            })
+                        });
+                    }
+                } else {
+                    liff.login();
+                }
+            } catch (error) {
+                console.error('error :',error);
+            }
+        }
+        initLIFF();
         
 
     </script>

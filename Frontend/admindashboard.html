@@ -100,7 +100,7 @@
     <div id="Process-Popup">
         <div class="Process-Content">
             <h1>Process-Booking</h1>
-            <div class="process">
+            <div id="process">
                 <div class="process-row">
                     <label>รายการขยะ: </label>
                     <select  class="waste-types">
@@ -135,8 +135,9 @@
                     <label>/กก</label>      
                 </div>
             </div>
+            <button onclick="addROW()" class="addROW">เพิ่มรายการ</button>
             <div class="DT-button">
-                <button class="yes" onclick="">ยืนยัน</button>
+                <button class="yes" onclick="submitProcess()">ยืนยัน</button>
                 <button class="no" onclick="CloseProcessPopup()">ปิด</button>
             </div>
         </div>
@@ -255,7 +256,107 @@
                 console.error('error : ', error);
             }
         }
+
         loadBookDetail();
+
+        function addROW() {
+            try {
+                
+                const process = document.getElementById('process'); 
+                const newRow = document.createElement('div');
+                newRow.className = 'process-row';
+
+                newRow.innerHTML=`
+                    
+                    <label>รายการขยะ: </label>
+                    <select  class="waste-types">
+                            <option value="เลือก">เลือก</option>
+                                <optgroup label="พลาสติก-กระดาษ">
+                                    <option value="พลาสติกรวม">พลาสติกรวม</option>
+                                    <option value="กระดาษลัง">กระดาษลัง</option>
+                                    <option value="ท่อ PVC ฟ้า">ท่อ PVC ฟ้า</option>
+                                </optgroup>
+                                <optgroup label="เหล็ก">
+                                    <option value="ลวด">ลวด</option>
+                                    <option value="เหล็กรวม - ม้วนกลม">เหล็กรวม - ม้วนกลม</option>
+                                    <option value="เหล็กหนาสั้น">เหล็กหนาสั้น</option>
+                                    <option value="เหล็กหนายาว">เหล็กหนายาว</option>
+                                    <option value="เหล็กบาง - ตะปู">เหล็กบาง - ตะปู</option>
+                                </optgroup>
+                                <optgroup label="โหละ">
+                                    <option value="อลูมิเนียมเพลท">อลูมิเนียมเพลท</option>
+                                    <option value="อลูมิเนียมกระป๋อง 1 kg. ขึ้นไป">อลูมิเนียมกระป๋อง 1 kg. ขึ้นไป</option>
+                                    <option value="สแตนเลสแท้ 304 (ชิ้นเล็ก)">สแตนเลสแท้ 304 (ชิ้นเล็ก)</option>
+                                    <option value="สแตนเลส (ชิ้นใหญ่)">สแตนเลส (ชิ้นใหญ่)</option>
+                                    <option value="ตะกั่ว - จั๊บ แกะไม่ติด">ตะกั่ว - จั๊บ แกะไม่ติด</option>
+                                </optgroup>
+                                <optgroup label="แก้ว">
+                                    <option value="แก้วขาว">แก้วขาว</option>
+                                    <option value="แก้วแดง">แก้วแดง</option>
+                                    <option value="แก้วรวม">แก้วรวม</option>
+                                </optgroup>
+                    </select>
+                    <label>น้ำหนัก: </label>
+                    <input type="text">
+                    <label>/กก</label>      
+                    <button onclick="this.parentElement.remove()" >ลบ</button>
+                
+                `;
+                process.appendChild(newRow);
+
+            } catch (error) {
+                console.error('error : ', error);
+            }
+        }
+
+        async function submitProcess() {
+            
+            let wasteList = [];
+            const ROW = document.querySelectorAll('.process-row');
+
+            ROW.forEach(row => {
+                const selectEl = row.querySelector('.waste-types');
+                const wasteTypes = selectEl.value;
+
+                const inputEL = row.querySelector('input');
+                const weight = inputEL.value;
+
+                if (wasteTypes !== 'เลือก' && weight !== '') {
+                    wasteList.push({
+                        Type: wasteTypes,
+                        weight : weight
+                    });
+                }
+            });
+
+            try {
+                const response = await fetch('/api/processWaste/',{
+                    method: 'PUT',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        booking_id: bookingID, 
+                        items: wasteList
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('บันทึกข้อมูลเรียบร้อย');
+                    
+                }else {
+                    alert('ไม่สามารถบันทึกข้อมูลได้');
+                }
+                CloseProcessPopup();
+                document.location.reload();
+            } catch (error) {
+                console.error('error : ', error);
+            }
+
+            console.log("bookingID:", bookingID);
+            console.log("รายการขยะทั้งหมด:", wasteList);
+            
+        }
         
         const map = new L.Map('map').setView([13.7563, 100.5018], 13);
         new L.TileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {

@@ -57,6 +57,10 @@
         </div>
         <div class="bookdetail">
             <h1>ข้อมูลการจอง</h1>
+            <div class="addLine">
+                <h2>การแจ้งเตือนข้อมูลการจอง</h2>
+                <button onclick="openAddline()">ADD Line OA</button>
+            </div>
             <div id="detail">
                 <div class="DTbox">
                     <div class="DT">
@@ -78,6 +82,17 @@
         </div>
     </div>
 
+    <div id="addline-Popup">
+        <div class="addline-Content">
+            <h1>ADD Line OA เพื่อรับการแจ้งเตือน</h1>
+            <img src="/img/ADD_LineOA_ReBin.png">
+            <!-- <button href="https://line.me/R/ti/p/@396zfeoa">ADD Line</button> -->
+            <div class="exit-button">
+                <button class="no" onclick="closeAddline()">ปิด</button>
+            </div>
+        </div>
+    </div>
+
 
 
     <script>
@@ -86,6 +101,12 @@
         }
         function closeExit() {
             document.getElementById('exit-Popup').style.display = 'none' ; 
+        }
+        function openAddline() {
+            document.getElementById('addline-Popup').style.display = 'flex' ;
+        }
+        function closeAddline() {
+            document.getElementById('addline-Popup').style.display = 'none' ; 
         }
         function exit() {
             document.location='/';

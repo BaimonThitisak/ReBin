@@ -202,7 +202,21 @@ button{
     font-size: 16px;
     margin-bottom: 20px;
     gap: 15px;
-}.DT-button{
+    margin: 10px;
+
+}
+.process-row button{
+    background-color: red;  
+    color: white;
+    border: none;
+    border-radius: 30px;
+}
+.DT-button{
     margin-top: 20px;
+}
+.addROW{
+    background-color: #4c8172;
+    border-radius: 30px;
+    border: none;
 }
 

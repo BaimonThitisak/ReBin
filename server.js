@@ -2,13 +2,21 @@ import { error } from 'console';
 import express from 'express';
 import mysql from 'mysql2';
 import path from 'path';
+import * as line from '@line/bot-sdk';
 
+// const line = require('@line/bot-sdk');
 // const mysql = require('mysql2');
 // const path = require('path');
 
 const app = express();
 const port = 3000;
 const __dirname = import.meta.dirname;
+const lineConfig = {
+    channelAccessToken: '7oiJ3rpc4E8yE0d84XtYzruPViZ9VoNv8JzxROujGapYKuDjr1HOaFfWovPr4DcS58QHogyQgJ5xxaRlJxaLksshiaZKQ3isf/T5cGECQ32s4LhwJXCQMmHtYt1A+jaxBA4zQOkcxv5XrgErdaIajgdB04t89/1O/w1cDnyilFU='
+};
+const client = new line.messagingApi.MessagingApiClient({
+    channelAccessToken: lineConfig.channelAccessToken
+});
 
 app.use(express.json());
 
@@ -105,6 +113,35 @@ app.post('/api/booking/', async (req, res) => {
             res.json({message: 'บันทึกการจองเรียบร้อยแล้ว'});
         }
     } )
+    const googleMapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+
+    const sqlfineline = "SELECT lineID FROM user WHERE userid = ?";
+    db.query(sqlfineline, [user_id], async (err,results) => {
+        if (err) {
+            console.error('DB : ',err);
+        }
+        if (results.length > 0 && results[0].lineID) {
+            const LineId = results[0].lineID;
+
+            try {
+                await client.pushMessage({
+                    to: LineId,
+                    messages:[
+                        {
+                            type: 'text',
+                            text: `จองคิวนัดหมายสำเร็จ\nข้อมูลการนัดหมาย\nชื่อผู้นัด : ${name}\nวันที่นัด : ${date}\nเวลาที่นัด : ${time}\nเบอร์ผู้นัด : ${phone}\nสถานที่นักหมาย : ${googleMapsLink}\nเมื่อใกล้ถึงเวลานัดเจ้าหน้าที่จะแจ้งให้ทราบอีกที!!!`,
+                        }
+                    ]
+                })
+                console.log("ส่งแจ้งเตือน LINE สำเร็จ!");
+            } catch (errorLine) {
+                console.error("Error การแจ้งเตือน Line:", errorLine.message);
+            }
+
+        } else {
+            console.log("ผู้ใช้ยังไม่ได้ผูกบัญชี LINE");
+        }
+    })
 
 })
 app.get('/api/price/', async (req, res) => {
@@ -166,6 +203,27 @@ app.get('/api/bookdetail/', async (req, res) => {
             } else {
                 res.status(400).json({message : 'ไม่พบผู้ใช้'});
             }
+        }
+    })
+})
+
+app.post('/api/processWaste/', async (req, res) => {
+
+})
+
+app.post('/api/update-line-id/', async (req, res ) => {
+    const {userid,lineID} =req.body;
+    
+    if (!userid || !lineID) {
+        return res.status(400).json({ error: 'ข้อมูลไม่ครบถ้วน' });
+    }
+
+    const sql = "UPDATE user SET lineID = ? WHERE userid = ?";
+    db.query(sql, [lineID, userid], (err,result) => {
+        if (err) {
+            res.status(500).json({error : err.message});
+        }else{
+            res.json({ message: 'บันทึก LINE ID สำเร็จ' });
         }
     })
 })

@@ -162,3 +162,62 @@ button{
     flex-direction: 
     row; gap: 30px;
 }
+.addLine{
+    display: flex;
+    flex-direction: row;
+    align-content: flex-end;    
+    gap: 10px;
+    margin: -20px 0;
+    padding: 0;
+}
+.addLine button{
+    background-color: #a1d0be;
+    color: white;
+    border-radius: 30px;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    height: 40px;
+    margin-top: 18px;
+    box-shadow: 0 0 2px black;
+}
+#addline-Popup{
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(115, 115, 115, 0.5);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+}
+
+.addline-Content{
+    display: flex;
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+.addline-Content img{
+    display: flex;
+    width: 200px;
+    height: auto;
+    justify-content: center;
+}
+.addline-Content button{
+    background-color: #4c8172;
+    color: white;
+    width: fit-content;
+    border-radius: 30px;
+    border: none;
+    align-items: center;
+    font-size: 16px;
+    padding: 10px;
+}
+.addline-Content .no {
+    background-color: rgb(217, 99, 99);
+}
