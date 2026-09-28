@@ -72,25 +72,38 @@
             <div class="bank">
                 <label>ธนาคารปลายทาง:</label>
                 <select id="bank">
-                        <option value="SCB">ธนาคารไทยพาณิชย์ (SCB)</option>
-                        <option value="KBANK">ธนาคารกสิกรไทย (KBANK)</option>
-                        <option value="BBL">ธนาคารกรุงเทพ (BBL)</option>
-                        <option value="KTB">ธนาคารกรุงไทย (KTB)</option>
-                        <option value="BAY">ธนาคารกรุงศรีอยุธยา (BAY)</option>
+                        <option value="scb">ธนาคารไทยพาณิชย์ (SCB)</option>
+                        <option value="kbank">ธนาคารกสิกรไทย (KBANK)</option>
+                        <option value="bbl">ธนาคารกรุงเทพ (BBL)</option>
+                        <option value="ktb">ธนาคารกรุงไทย (KTB)</option>
+                        <option value="bay">ธนาคารกรุงศรีอยุธยา (BAY)</option>
                 </select>
             </div>
             <div class="bankaccount">
                 <label>หมายเลขบัญชีธนาคาร</label>
-                <input type="text">
+                <input type="text" id="accountnumber">
+            </div>
+            <div class="nameaccount">
+                <label>ชื่อบัญชี</label>
+                <input type="text" id="accountname">
             </div>
             <div class="money">
                 <label>จำนวนเงิน</label>
-                <input type="text">
+                <input type="text" id="amount_balance">
             </div>
-            <button class="bt-withdraw">ถอนเงิน</button>
+            <button class="bt-withdraw" onclick="openWithdraw()">ถอนเงิน</button>
         
         </div>
 
+    </div>
+    <div id="withdraw-Popup">
+        <div class="withdraw-Content">
+            <h1>ยืนยันการถอนเงิน</h1>
+            <div class="exit-button">
+                <button class="yes" onclick="withdraw()">ยืนยัน</button>
+                <button class="no" onclick="closeWithdraw()">ยกเลิก</button>
+            </div>
+        </div>
     </div>
 
 
@@ -106,7 +119,12 @@
             document.location='/';
             localStorage.clear();
         }
-
+        function openWithdraw() {
+            document.getElementById('withdraw-Popup').style.display = 'flex' ;
+        }
+        function closeWithdraw() {
+            document.getElementById('withdraw-Popup').style.display = 'none' ; 
+        }
         async function loadWallet() {
             
             const user_id = localStorage.getItem('user_id');
@@ -127,6 +145,56 @@
         }
 
         loadWallet();
+
+        async function withdraw() {
+            const namebank = document.getElementById('bank').value;
+            const accountnumber = document.getElementById('accountnumber').value;
+            const accountname = document.getElementById('accountname').value;
+            const amount = document.getElementById('amount_balance').value;
+            const userid = localStorage.getItem('user_id');
+
+            if (!accountnumber) {
+                alert('กรุณาใส่หมายเลขธนาคาร');
+                closeWithdraw()
+                return;
+            }
+            if (!accountname) {
+                alert('กรุณาใส่ชื่อบัญชีธนาคาร');
+                closeWithdraw()
+                return;
+            }
+            if (!amount) {
+                alert('กรุณาใส่จำนวนเงิน');
+                closeWithdraw()
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/withdraw/',{
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        userid: userid,
+                        namebank: namebank,
+                        accountnumber: accountnumber,
+                        accountname: accountname,
+                        amount: amount,
+                    })
+                })
+                const result = await response.json();
+                if (response.ok) {
+                    alert('ถอนเงินเรียบร้อย');
+                } else {
+                    alert('ถอนเงินผิดพลาด สาเหตุ: ' + (result.error || result.message || 'ไม่ทราบสาเหตุ'));
+                    console.log('Error :', result);
+                }
+            } catch (error) {
+                console.error('Error', error);
+                alert('Error! โปรดลองใหม่');
+            }
+            closeWithdraw();
+            document.location.reload();
+        }
 
     </script>
     

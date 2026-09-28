@@ -30,6 +30,7 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "mysql2": "^3.24.2",
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^3.3.2",
+    "omise": "^1.1.0"
   }
 }

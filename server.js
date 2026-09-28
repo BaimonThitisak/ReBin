@@ -3,10 +3,15 @@ import express from 'express';
 import mysql from 'mysql2';
 import path from 'path';
 import * as line from '@line/bot-sdk';
+import Omise from 'omise';
 
 // const line = require('@line/bot-sdk');
 // const mysql = require('mysql2');
 // const path = require('path');
+// const omise = require('omise')({
+//   'secretKey': 'skey_test_68sbflmnoyj3nc8dvfs',
+//   'omiseVersion': '2019-05-29'
+// });
 
 const app = express();
 const port = 3000;
@@ -16,6 +21,9 @@ const lineConfig = {
 };
 const client = new line.messagingApi.MessagingApiClient({
     channelAccessToken: lineConfig.channelAccessToken
+});
+const omise = Omise({
+    secretKey: 'skey_test_68sbflmnoyj3nc8dvfs',
 });
 
 app.use(express.json());
@@ -70,7 +78,7 @@ app.post('/api/signUp', async (req, res) => {
     db.query(sql, [username, password, firstname, lastname, email], (err, results) => {
         if (err) {
             console.error("ไม่สามารถบันทึกได้ : ",err);
-            res.status(500).json({error : err.message });
+            return res.status(500).json({error : err.message });
         }
 
         res.json({
@@ -107,7 +115,7 @@ app.post('/api/booking/', async (req, res) => {
     db.query(sql, [user_id, name, date, time, latitude, longitude, phone], (err,results) => {
         if (err) {
             console.error('ไม่สามารถบันทึกการจองได้ : ', err);
-            res.status(500).json({error : err.message});
+            return res.status(500).json({error : err.message});
 
         } else {
             res.json({message: 'บันทึกการจองเรียบร้อยแล้ว'});
@@ -162,7 +170,7 @@ app.get('/api/user/:id', async (req, res) => {
     db.query(sql, [user_id] , (err,result) =>{
         if (err) {
             console.error('ไม่สารมารถดึงข้อมูลกระเป๋าตังได้ : ', err);
-            res.status(500).json({error : err.message});
+            return res.status(500).json({error : err.message});
         } else{
             if (result.length>0) {
                 res.json(result[0]);
@@ -180,7 +188,7 @@ app.get('/api/bookdetail/:id', async (req, res) => {
     db.query(sql, [user_id] , (err,result) =>{
         if (err) {
             console.error('ไม่สารมารถดึงข้อมูลกระเป๋าตังได้ : ', err);
-            res.status(500).json({error : err.message});
+            return res.status(500).json({error : err.message});
         } else{
             if (result.length>0) {
                 res.json(result);
@@ -196,7 +204,7 @@ app.get('/api/bookdetail/', async (req, res) => {
     db.query(sql, (err,result) =>{
         if (err) {
             console.error('ไม่สารมารถดึงข้อมูลกระเป๋าตังได้ : ', err);
-            res.status(500).json({error : err.message});
+            return res.status(500).json({error : err.message});
         } else{
             if (result.length>0) {
                 res.json(result);
@@ -221,13 +229,98 @@ app.post('/api/update-line-id/', async (req, res ) => {
     const sql = "UPDATE user SET lineID = ? WHERE userid = ?";
     db.query(sql, [lineID, userid], (err,result) => {
         if (err) {
-            res.status(500).json({error : err.message});
+            return res.status(500).json({error : err.message});
         }else{
             res.json({ message: 'บันทึก LINE ID สำเร็จ' });
         }
     })
 })
 
+app.post('/api/withdraw/', async (req,res) => {
+    const {userid, namebank, accountnumber, accountname, amount}=req.body;
+
+    try {
+        const checkbalance = "SELECT wallet_balance FROM user WHERE userid = ? FOR UPDATE";
+        db.query(checkbalance, [userid], (err, results) => {
+            if (err) {
+                console.error('Error ดึงข้อมูล',err);
+                return res.status(500).json({error: err.message});
+            }
+            
+            const user = results[0];
+            const CurrentBalance = user.wallet_balance;
+
+            if (CurrentBalance >= amount) {
+                const updatebalance = "UPDATE user SET wallet_balance = wallet_balance - ? WHERE userid = ?";
+                db.query(updatebalance, [amount, userid], (err, results) => {
+                    if (err) {
+                        console.error('ไม่สามารถอัปเดตจำนวนเงินได้ :',err);
+                        return res.status(500).json({error : err.message});
+                    } 
+                    const transaction = "INSERT INTO transactions(user_id, amount, bank, account_number, account_name, status, created_at) VALUES (?, ?, ?, ?, ?, 'PENDING', NOW())";
+                    db.query(transaction, [userid, amount, namebank, accountnumber, accountname], async (err, result) => {
+                        if (err) {
+                            console.error('ไม่สามารถบันทึกประวัติการเงินได้ : ', err);
+                            return res.status(500).json({error : err.message});
+                        }
+                        const transactionID = result.insertId;
+
+                        omise.recipients.create({
+                            name: accountname,
+                            type: 'individual',
+                            bank_account: {
+                                brand: namebank,
+                                number: accountnumber,
+                                name: accountname,
+                            }
+                        }, (err,recipient) => {
+                            if (err) {
+                                console.error('สร้าง recipient ไม่ได้ : ', err);
+                                return res.status(500).json({error : err.message});
+                            }
+                            const transfers = omise.transfers.create({
+                                amount:amount*100,
+                                recipient: recipient.id,
+                            }, (err,transfers) => {
+                                if (err) {
+                                    console.error('สร้าง transfers ไม่ได้ : ', err);
+                                    return res.status(500).json({error : err.message});
+                                }
+                                const updateTransfers = "UPDATE transactions SET omise_transfer_id = ?, status = ? WHERE id = ?";
+                                let status;
+                                if (transfers.paid === true) {
+                                    status = 'SUCCESS'; 
+                                } else {
+                                    status = 'PENDING';
+                                }
+                                db.query(updateTransfers, [transfers.id, status, transactionID], async (err,results) =>{
+                                    if (err) {
+                                        console.error('ไม่สามารถส่งคำขอถอนเงินได้เงินได้ : ', err);
+                                        return res.status(500).json({ error: err.message });
+                                    } else{
+                                        return res.json({
+                                            success: true,
+                                            message: 'ส่งคำขอถอนเงินเรียบร้อยแล้ว',
+                                            transferId: transfers.id,
+                                        });
+                                    }
+                                });
+                            });
+                        });
+                    });
+                
+                });
+                    
+            } else{
+                return res.status(400).json({ error: 'ยอดเงินคงเหลือไม่เพียงพอ' });
+            }
+
+        })
+        
+    } catch{
+
+    }
+})
 
 app.listen(port, () => {
     console.log(`Server is Running on http://localhost:${port}`);

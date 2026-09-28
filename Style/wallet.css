@@ -70,6 +70,23 @@ button{
     border-radius: 5px;
     text-align: center;
 }
+#withdraw-Popup{
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(115, 115, 115, 0.5);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+}
+
+.withdraw-Content{
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+}
 
 .yes{
     background-color: #4c8172;
@@ -139,10 +156,10 @@ button{
     font-size: 46px;
 }
 .withdraw label{
-    font-size: 28px;
+    font-size: 20px;
 }
 .withdraw input{
-    font-size: 28px;
+    font-size: 20px;
     border-radius: 30px;
     border: none;
     padding: 5px 15px;
@@ -161,14 +178,21 @@ button{
     flex-direction: column;
     gap: 20px;
     align-items: center;
-    margin-top: 10px;
+    margin-top: 5px;
+}
+.nameaccount{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    margin-top: 5px;
 }
 .money{
     display: flex;
     flex-direction: column;
     gap: 20px;
     align-items: center;
-    margin-top: 10px;
+    margin-top: 5px;
 }
 .bt-withdraw{
     background-color: white;
