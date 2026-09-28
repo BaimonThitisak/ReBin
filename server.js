@@ -5,13 +5,7 @@ import path from 'path';
 import * as line from '@line/bot-sdk';
 import Omise from 'omise';
 
-// const line = require('@line/bot-sdk');
-// const mysql = require('mysql2');
-// const path = require('path');
-// const omise = require('omise')({
-//   'secretKey': 'skey_test_68sbflmnoyj3nc8dvfs',
-//   'omiseVersion': '2019-05-29'
-// });
+
 
 const app = express();
 const port = 3000;
@@ -215,8 +209,100 @@ app.get('/api/bookdetail/', async (req, res) => {
     })
 })
 
-app.post('/api/processWaste/', async (req, res) => {
+app.put('/api/processWaste/', async (req, res) => {
+    const {booking_id, items} = req.body;
+    if (!booking_id || !items) {
+        return res.status(400).json({ error: 'ข้อมูลไม่ครบถ้วน'});
+    }
 
+    const sql = "SELECT user_id FROM booking WHERE booking_id = ?";
+    db.query(sql, [booking_id], async (err, result) =>{
+        if (err) {
+            return res.status(500).json({error : err.message});
+        }
+        const userId = result[0].user_id;
+        
+        const getPrice = "SELECT * FROM waste_types";
+        db.query(getPrice, async (error, priceResult) =>{
+            if (error) {
+                return res.status(500).json({error : error.message});
+            }
+
+            const wasteprice = {};
+            priceResult.forEach(row =>{
+                wasteprice[row.waste_name] = row.price_per_kg;
+            });
+
+            let totalPrice = 0;
+            let wasteMessage = "สรุปรายการรับซื้อขยะ Rebin\n";
+            items.forEach(item => {
+                const price = wasteprice[item.waste_type];
+                const total = price * parseFloat(item.weight);
+
+                totalPrice += total;
+                wasteMessage += `- ${item.waste_type}: ${item.weight} กก. (${total.toFixed(2)} บาท)\n`;
+            });
+            wasteMessage += `\nราคารวมทั้งหมด: ${totalPrice.toFixed(2)} บาท`;
+
+            const insert = items.map(item => {
+                const PricePerKg = wasteprice[item.waste_type];
+                const priceTotal = PricePerKg * parseFloat(item.weight);
+                return [booking_id, item.waste_type, PricePerKg, parseFloat(item.weight), priceTotal];
+            });
+
+            const insertSQL = "INSERT INTO book_detail(book_id, waste, price_per_kg, weigth, total_price) VALUES ?";
+            db.query(insertSQL, [insert], async (err, insertResult) =>{
+                if (err) {
+                    return res.status(500).json({ error: err.message });
+                }
+                const UpdateBalance = "UPDATE user SET wallet_balance = wallet_balance + ? WHERE userid = ?";
+                db.query(UpdateBalance, [totalPrice, userId], async (err, balanceResult) =>{
+                    if (err) {
+                        return res.status(500).json({ error: err.message });
+                    }
+
+                    const UpdateStatus = "UPDATE booking SET status = 'completed' WHERE booking_id = ?";
+                    db.query(UpdateStatus, [booking_id], (err, statusResult) => {
+                        if (err) {
+                            return res.status(500).json({ error: err.message });
+                        }
+        
+                        const FineLineId = "SELECT lineID FROM user WHERE userid = ?";
+                        db.query(FineLineId, [userId], async (err, lineResult) =>{
+                            if (err) {
+                                return res.status(500).json({ error: err.message });
+                            }
+
+                            if (lineResult.length > 0 && lineResult[0].lineID) {
+                                const LineId = lineResult[0].lineID;
+
+                                try {
+                                    await client.pushMessage({
+                                        to: LineId,
+                                        messages:[
+                                            {
+                                                type: 'text',
+                                                text: wasteMessage,
+                                            }
+                                        ]
+                                    })
+                                    console.log("ส่งแจ้งเตือน LINE สำเร็จ!");
+                                } catch (errorLine) {
+                                    console.error("Error การแจ้งเตือน Line:", errorLine.message);
+                                }
+                            } else {
+                                console.log("ผู้ใช้ยังไม่ได้ผูกบัญชี LINE");
+                            }
+                            return res.json({
+                                message: 'ประมวลผลรับซื้อขยะและเพิ่มเงินเข้ากระเป๋าเรียบร้อย',
+                                totalPrice: totalPrice
+                            });
+                        })
+                    })
+                })
+            })
+        })
+    })
 })
 
 app.post('/api/update-line-id/', async (req, res ) => {
@@ -320,6 +406,60 @@ app.post('/api/withdraw/', async (req,res) => {
     } catch{
 
     }
+})
+
+app.post('/api/lineAlert/', async (req, res) => {
+    const {booking_id} = req.body;
+
+    if (!booking_id) {
+        return res.status(500).json({error : 'ข้อมูลไม่ครบ'});
+    }
+
+    const sql = "SELECT * FROM booking WHERE booking_id = ?";
+    db.query(sql, [booking_id], async (err,result) => {
+        if (err) {
+            console.error('DB :',err);
+            return res.status(500).json({ error: err.message });
+        }
+        if (result.length > 0) {
+            const findLineId = "SELECT lineID FROM user WHERE userid = ?";  
+            const userid = result[0].user_id;
+            db.query (findLineId, [userid], async (error, results) =>{
+                if (error) {
+                    console.error('DB :',error);
+                    return res.status(500).json({ error: error.message });
+                }
+                
+                if (results.length>0 && results[0].lineID) {
+                    const LineId = results[0].lineID;
+
+                    try {
+                        await client.pushMessage({
+                            to: LineId,
+                            messages: [
+                                {
+                                    type: 'text',
+                                    text: `เจ้าหน้าที่กำลังไปหาคุณ โปรดเตรียมขยะไว้ให้พร้อม`,
+                                }
+                            ]
+                        })
+                        console.log('ส่งการแจ้งเตือน Line เรียบร้อย');
+                        return res.json({ message: 'ส่งการแจ้งเตือน Line เรียบร้อย' });
+                    } catch (error) {
+                        console.error('Error Line:', error.message);
+                        return res.status(500).json({ error: error.message });
+                    }
+                } else {
+                    return res.status(400).json({ error: 'ไม่พบข้อมูล LINE ID ของผู้ใช้งาน' });
+                }
+                
+            });
+        } else{
+            console.error('ไม่พบข้อมูล');
+            return res.status(400).json({ error: 'ไม่พบข้อมูล' });
+        }
+        
+    });
 })
 
 app.listen(port, () => {

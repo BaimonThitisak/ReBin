@@ -91,7 +91,7 @@
                 <div id="status">สถานะ :</div>
             </div>
             <div class="DT-button">
-                <button class="yes" onclick="">กำลังไป!!!</button>
+                <button class="yes" onclick="lineAlert()">กำลังไป!!!</button>
                 <button class="no" onclick="CloseDetailPopup()">ปิด</button>
             </div>
         </div>
@@ -309,6 +309,32 @@
             }
         }
 
+        async function lineAlert() {
+            if (!bookingID) {
+                alert('ไม่พบข้อมูลการจอง');
+                return ;
+            }
+            try {
+                const response = await fetch('/api/lineAlert/',{
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        booking_id: bookingID 
+                    })
+                })
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('แจ้งเตือนเรียบร้อย');
+                } else {
+                    alert('ไม่สามารถส่งแจ้งเตือนได้');
+                }
+            } catch (error) {
+                console.error('Error', error);
+                alert('Error!! โปรดลองใหม่อีกครั้ง');
+            }
+        }
+
         async function submitProcess() {
             
             let wasteList = [];
@@ -323,7 +349,7 @@
 
                 if (wasteTypes !== 'เลือก' && weight !== '') {
                     wasteList.push({
-                        Type: wasteTypes,
+                        waste_type: wasteTypes,
                         weight : weight
                     });
                 }
@@ -342,7 +368,7 @@
                 const result = await response.json();
 
                 if (response.ok) {
-                    alert('บันทึกข้อมูลเรียบร้อย');
+                    alert(`บันทึกข้อมูลเรียบร้อย (ยอดเงินรวม : ${result.totalPrice})`);
                     
                 }else {
                     alert('ไม่สามารถบันทึกข้อมูลได้');
