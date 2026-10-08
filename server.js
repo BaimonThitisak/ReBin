@@ -1,31 +1,56 @@
+import dotenv from 'dotenv';
 import { error } from 'console';
-import express from 'express';
+import express, { json } from 'express';
 import mysql from 'mysql2';
 import path from 'path';
 import * as line from '@line/bot-sdk';
 import Omise from 'omise';
+import { request } from 'http';
 
-
+dotenv.config();
 
 const app = express();
 const port = 3000;
 const __dirname = import.meta.dirname;
-const lineConfig = {
-    channelAccessToken: '7oiJ3rpc4E8yE0d84XtYzruPViZ9VoNv8JzxROujGapYKuDjr1HOaFfWovPr4DcS58QHogyQgJ5xxaRlJxaLksshiaZKQ3isf/T5cGECQ32s4LhwJXCQMmHtYt1A+jaxBA4zQOkcxv5XrgErdaIajgdB04t89/1O/w1cDnyilFU='
+const lineConfig = { 
+    channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN
 };
 const client = new line.messagingApi.MessagingApiClient({
     channelAccessToken: lineConfig.channelAccessToken
 });
 const omise = Omise({
-    secretKey: 'skey_test_68sbflmnoyj3nc8dvfs',
+    secretKey: process.env.OMISE_SECRET_KEY,
 });
+
+async function getKBankAccessToken() {
+  try {
+
+    const encodedCredentials = process.env.KBANK_ENCODE_CREDENTIALS;
+
+    const response = await fetch('https://openapi-sandbox.kasikornbank.com/v1/oauth/token',{
+        method:'POST',
+        headers:{
+            'Authorization': `Basic NmROaHdzY2ptZUdQNlVhT21uWGExUXF5Z3B3R1pneUg6bUtHWnFMVmtBTjBuY1Zudw==`,
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({ grant_type: 'client_credentials' })
+    });
+    
+    const data = await response.json();
+    console.log('OAuth Token Response:', data);
+    return data.access_token;
+
+  } catch (error) {
+    console.error('Error', error.message);
+  }
+}
 
 app.use(express.json());
 
 app.use('/Style', express.static(path.join(__dirname, 'Style')));
 app.use('/img', express.static(path.join(__dirname, 'img')));
 
-// เชื่อมหน้า
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname,'Frontend','signin.html'));
 });
@@ -262,13 +287,13 @@ app.put('/api/processWaste/', async (req, res) => {
                     }
 
                     const UpdateStatus = "UPDATE booking SET status = 'completed' WHERE booking_id = ?";
-                    db.query(UpdateStatus, [booking_id], (err, statusResult) => {
+                    db.query(UpdateStatus, [booking_id], async (err, statusResult) => {
                         if (err) {
                             return res.status(500).json({ error: err.message });
                         }
         
-                        const FineLineId = "SELECT lineID FROM user WHERE userid = ?";
-                        db.query(FineLineId, [userId], async (err, lineResult) =>{
+                        const FindLineId = "SELECT lineID FROM user WHERE userid = ?";
+                        db.query(FindLineId, [userId], async (err, lineResult) =>{
                             if (err) {
                                 return res.status(500).json({ error: err.message });
                             }
@@ -323,7 +348,7 @@ app.post('/api/update-line-id/', async (req, res ) => {
 })
 
 app.post('/api/withdraw/', async (req,res) => {
-    const {userid, namebank, accountnumber, accountname, amount}=req.body;
+    const {userid, bankCode, accountnumber, accountname, amount}=req.body;
 
     try {
         const checkbalance = "SELECT wallet_balance FROM user WHERE userid = ? FOR UPDATE";
@@ -334,9 +359,9 @@ app.post('/api/withdraw/', async (req,res) => {
             }
             
             const user = results[0];
-            const CurrentBalance = user.wallet_balance;
+            const NowBalance = user.wallet_balance;
 
-            if (CurrentBalance >= amount) {
+            if (NowBalance >= amount) {
                 const updatebalance = "UPDATE user SET wallet_balance = wallet_balance - ? WHERE userid = ?";
                 db.query(updatebalance, [amount, userid], (err, results) => {
                     if (err) {
@@ -344,7 +369,7 @@ app.post('/api/withdraw/', async (req,res) => {
                         return res.status(500).json({error : err.message});
                     } 
                     const transaction = "INSERT INTO transactions(user_id, amount, bank, account_number, account_name, status, created_at) VALUES (?, ?, ?, ?, ?, 'PENDING', NOW())";
-                    db.query(transaction, [userid, amount, namebank, accountnumber, accountname], async (err, result) => {
+                    db.query(transaction, [userid, amount, bankCode, accountnumber, accountname], async (err, result) => {
                         if (err) {
                             console.error('ไม่สามารถบันทึกประวัติการเงินได้ : ', err);
                             return res.status(500).json({error : err.message});
@@ -355,7 +380,7 @@ app.post('/api/withdraw/', async (req,res) => {
                             name: accountname,
                             type: 'individual',
                             bank_account: {
-                                brand: namebank,
+                                brand: bankCode,
                                 number: accountnumber,
                                 name: accountname,
                             }
@@ -391,7 +416,39 @@ app.post('/api/withdraw/', async (req,res) => {
                                         });
                                     }
                                 });
+                                
                             });
+                            
+                            const withdrawFindLineId = "SELECT * FROM user WHERE userid = ?";
+                            db.query(withdrawFindLineId, [userid], async (err, lineResult) =>{
+                                if (err) {
+                                    return res.status(500).json({ error: err.message });
+                                }
+
+                                if (lineResult.length > 0 && lineResult[0].lineID) {
+                                    const LineId = lineResult[0].lineID;
+                                    const wallet_balance = lineResult[0].wallet_balance;
+
+                                    try {
+                                        await client.pushMessage({
+                                            to: LineId,
+                                            messages:[
+                                                {
+                                                    type: 'text',
+                                                    text: `ถอนเงินเรียบร้อยแล้ว\nยอดเงินคงเหลือ ${wallet_balance} บาท`,
+                                                }
+                                            ]
+                                        })
+                                        console.log("ส่งแจ้งเตือน LINE สำเร็จ!");
+                                    } catch (errorLine) {
+                                        console.error("Error การแจ้งเตือน Line:", errorLine.message);
+                                    }
+                                } else {
+                                    console.log("ผู้ใช้ยังไม่ได้ผูกบัญชี LINE");
+                                }
+                                
+                            })
+                            
                         });
                     });
                 

@@ -89,7 +89,7 @@
             </div>
             <div class="money">
                 <label>จำนวนเงิน</label>
-                <input type="text" id="amount_balance">
+                <input type="number" step="0.01" id="amount_balance">
             </div>
             <button class="bt-withdraw" onclick="openWithdraw()">ถอนเงิน</button>
         
@@ -147,7 +147,7 @@
         loadWallet();
 
         async function withdraw() {
-            const namebank = document.getElementById('bank').value;
+            const bankCode = document.getElementById('bank').value;
             const accountnumber = document.getElementById('accountnumber').value;
             const accountname = document.getElementById('accountname').value;
             const amount = document.getElementById('amount_balance').value;
@@ -175,7 +175,7 @@
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         userid: userid,
-                        namebank: namebank,
+                        bankCode: bankCode,
                         accountnumber: accountnumber,
                         accountname: accountname,
                         amount: amount,
