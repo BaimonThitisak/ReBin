@@ -25,15 +25,13 @@ async function getWastePrice() {
         const body = await response.text();
         const $ = cheerio.load(body);
 
-        // const wrapper = $('td[data-label="ประเภท"]');
-        // console.log(wrapper.body);
 
         const item = [];
+        
         $('tr').map((i, el) => {
             const wasteName = $(el).find('td[data-label="ประเภท"]').text().trim();
             const wastePrice = $(el).find('td[data-label="ราคารับซื้อ"]').text().trim();
-            // console.log('ชื่อขยะ: ${wastename} | ราคารับซื้อ: ${wasteprice}');
-            // console.log(wasteprice);
+
             if (selectWaste.includes(wasteName)) {
 
                 item.push({

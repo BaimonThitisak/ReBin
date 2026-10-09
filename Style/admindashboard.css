@@ -17,17 +17,17 @@ button{
     flex-direction: row;
     width: 100%;
     height: 70px;
-    padding: 0 20px;        /* เพิ่มระยะห่างจากขอบซ้าย-ขวาเล็กน้อย */
-    box-sizing: border-box; /* คํานวณ padding รวมในความกว้าง */
+    padding: 0 20px;       
+    box-sizing: border-box;
     z-index: 9999;
     position: fixed;
     top: 0;
     left: 0;
-    white-space: nowrap; /* 💡 ป้องกันไม่ให้ข้อความตกบรรทัดเวล่าย่อจอ */
+    white-space: nowrap;
 }
 .nav-bar p {
     color: white;
-    font-size: 20px;       /* ปรับขนาดตัวอักษรให้พอดีขึ้นเล็กน้อย */
+    font-size: 20px;    
     cursor: pointer;
     margin: 0;
 }
@@ -43,7 +43,7 @@ button{
     margin-top: 0px;
 }
 .space1 {
-    margin-left: auto;     /* 💡 สั่งให้กินพื้นที่ว่างฝั่งซ้ายทั้งหมด เพื่อผลักเมนูไปชิดขวาอย่างสมบูรณ์แบบ */
+    margin-left: auto;    
     margin-right: 20px;
 }
 .nav-bar p {

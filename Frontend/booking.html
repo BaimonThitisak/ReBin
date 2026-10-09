@@ -124,6 +124,35 @@
             localStorage.clear();
         }
         
+
+        let lineUserId = null;
+        async function initLIFF() {
+            try {
+                await liff.init({ liffId: '2011044286-bZoOlruD' });
+                if (liff.isLoggedIn()) {
+                    const profile = await liff.getProfile();
+                    lineUserId = profile.userId;
+
+                    const user_id = localStorage.getItem('user_id');
+
+                    if (user_id && lineUserId) {
+                        const response = await fetch('/api/update-line-id/', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                                userid: user_id,
+                                lineID: lineUserId,
+                            })
+                        });
+                    }
+                } else {
+                    liff.login();
+                }
+            } catch (error) {
+                console.error('error :',error);
+            }
+        }
+        initLIFF();
         
 
         const map = new L.Map('map').setView([13.7563, 100.5018], 13);
@@ -180,6 +209,7 @@
                 marker = L.marker([setlat, setlng], {icon: greenIcon}).addTo(map);
             }
         }).addTo(map);
+
         
         async function book() {
             const name = document.getElementById('bookname').value;
@@ -231,34 +261,7 @@
             
         }
 
-        let lineUserId = null;
-        async function initLIFF() {
-            try {
-                await liff.init({ liffId: '2011044286-bZoOlruD' });
-                if (liff.isLoggedIn()) {
-                    const profile = await liff.getProfile();
-                    lineUserId = profile.userId;
-
-                    const user_id = localStorage.getItem('user_id');
-
-                    if (user_id && lineUserId) {
-                        const response = ('/api/update-line-id/', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ 
-                                userid: user_id,
-                                lineID: lineUserId,
-                            })
-                        });
-                    }
-                } else {
-                    liff.login();
-                }
-            } catch (error) {
-                console.error('error :',error);
-            }
-        }
-        initLIFF();
+        
         
 
     </script>

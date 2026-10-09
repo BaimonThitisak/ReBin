@@ -22,29 +22,6 @@ const omise = Omise({
     secretKey: process.env.OMISE_SECRET_KEY,
 });
 
-async function getKBankAccessToken() {
-  try {
-
-    const encodedCredentials = process.env.KBANK_ENCODE_CREDENTIALS;
-
-    const response = await fetch('https://openapi-sandbox.kasikornbank.com/v1/oauth/token',{
-        method:'POST',
-        headers:{
-            'Authorization': `Basic NmROaHdzY2ptZUdQNlVhT21uWGExUXF5Z3B3R1pneUg6bUtHWnFMVmtBTjBuY1Zudw==`,
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams({ grant_type: 'client_credentials' })
-    });
-    
-    const data = await response.json();
-    console.log('OAuth Token Response:', data);
-    return data.access_token;
-
-  } catch (error) {
-    console.error('Error', error.message);
-  }
-}
-
 app.use(express.json());
 
 app.use('/Style', express.static(path.join(__dirname, 'Style')));
@@ -72,7 +49,7 @@ app.get('/booking', (req, res) => {
 app.get('/admindashboard', (req, res) => {
     res.sendFile(path.join(__dirname, 'Frontend', 'admindashboard.html'));
 });
-//
+
 
 const db = mysql.createConnection({
     host: "localhost",
@@ -260,6 +237,7 @@ app.put('/api/processWaste/', async (req, res) => {
 
             let totalPrice = 0;
             let wasteMessage = "สรุปรายการรับซื้อขยะ Rebin\n";
+            
             items.forEach(item => {
                 const price = wasteprice[item.waste_type];
                 const total = price * parseFloat(item.weight);
